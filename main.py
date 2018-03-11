@@ -55,13 +55,56 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    conv_1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
-    output = tf.layers.conv2d_transpose(conv_1x1, num_classes, 4, strides=(2, 2), padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
-    skip4 = tf.add(output, vgg_layer4_out)
-    skip4_trans = tf.layers.conv2d_transpose(skip4, num_classes, 4, strides=(2, 2), padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
-    skip3 = tf.add(skip4_trans, vgg_layer3_out)
-    skip3_trans = tf.layers.conv2d_transpose(skip3, num_classes, 16, strides=(8, 8), padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
-    return skip3_trans
+    # x = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    # x = tf.layers.conv2d_transpose(x, num_classes, 4, strides=(2, 2), padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    # x = tf.add(x, vgg_layer4_out)
+    # x = tf.layers.conv2d_transpose(x, num_classes, 4, strides=(2, 2), padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    # x = tf.add(x, vgg_layer3_out)
+    # x = tf.layers.conv2d_transpose(x, num_classes, 16, strides=(8, 8), padding="same", kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+
+    fcn = tf.layers.conv2d(vgg_layer7_out, 4096, 1, strides=1, padding='same', use_bias=False, name='conv_1',
+                           kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                           kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    fcn = tf.layers.batch_normalization(fcn, training=True, name='batch_1')
+
+    x = tf.layers.conv2d_transpose(fcn, 512, 3, strides=2, padding='same', use_bias=False, name='conv_2',
+                                    kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                                    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_2')
+    x = tf.layers.conv2d(x, 512, 1, strides=1, padding='same', use_bias=False, name='conv_3',
+                          kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                          kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_3')
+    x = tf.add(x, vgg_layer4_out)
+
+    x = tf.layers.conv2d(x, 512, 1, strides=1, padding='same', use_bias=False, name='conv_4',
+                          kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                          kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_4')
+    x = tf.layers.conv2d_transpose(x, 256, 7, strides=2, padding='same', use_bias=False, name='conv_5',
+                                    kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                                    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_5')
+    x = tf.layers.conv2d(x, 256, 1, strides=1, padding='same', use_bias=False, name='conv_6',
+                          kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                          kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_6')
+    x = tf.add(x, vgg_layer3_out)
+
+    x = tf.layers.conv2d(x, 64, 1, strides=1, padding='same', use_bias=False, name='conv_7',
+                          kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                          kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_7')
+    x = tf.layers.conv2d_transpose(x, num_classes, 16, strides=8, padding='same', name='conv_8',
+                                    kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                                    kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    x = tf.layers.batch_normalization(x, training=True, name='batch_8')
+
+    x = tf.layers.conv2d(x, num_classes, 1, strides=1, padding='same', use_bias=False, name='conv_9',
+                          kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                          kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+
+    return x
 tests.test_layers(layers)
 
 
@@ -99,16 +142,27 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param learning_rate: TF Placeholder for learning rate
     """
     # TODO: Implement function
-    pass
+    for epoch in epochs:
+        batch_num = 0
+        for images, labels in get_batches_fn(batch_size):
+            _, loss = sess.run([train_op, cross_entropy_loss],
+                               feed_dict={input_image: images, correct_label: labels, keep_prob: keep_prob, learning_rate:learning_rate})
+            batch += 1
+            print('Epoch {:>2}, step: {}, loss: {}  '.format(epoch + 1, batch_num, loss))
+
 tests.test_train_nn(train_nn)
 
 
 def run():
+    epochs = 3
+    batch_size = 10
     num_classes = 2
     image_shape = (160, 576)
+
     data_dir = './data'
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
+
 
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
@@ -127,11 +181,26 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
+        input_image, keep_prob, vgg_layer3, vgg_layer4, vgg_layer7 = load_vgg(sess, vgg_path)
+        nn_last_layer = layers(vgg_layer3, vgg_layer4, vgg_layer7, num_classes)
+        logits, optimizer, cross_entropy_loss = optimize(nn_last_layer, correct_label, learning_rate, num_classes)
+
+        saver = tf.train.Saver()
+        save_model_path = './model/semantic_segmentation_model.ckpt'
 
         # TODO: Train NN using the train_nn function
+        train_nn(sess, epochs, batch_size, get_batches_fn, optimizer, cross_entropy_loss, input_image,
+                 correct_label, keep_prob, learning_rate)
+
+        # save the trained model
+        saver.save(sess, save_model_path)
+        print("Model saved")
+
 
         # TODO: Save inference data using helper.save_inference_samples
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+
 
         # OPTIONAL: Apply the trained model to a video
 
