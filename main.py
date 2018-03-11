@@ -149,7 +149,9 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             #                    feed_dict={input_image: images, correct_label: labels, keep_prob: keep_prob, learning_rate:learning_rate})
             # batch += 1
             # print('Epoch {:>2}, step: {}, loss: {}  '.format(epoch + 1, batch_num, loss))
-            print images.shape
+            print(images.shape)
+            print(labels.shape)
+
 
 tests.test_train_nn(train_nn)
 
