@@ -126,7 +126,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 tests.test_optimize(optimize)
 
 
-def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, keep_prob, learning_rate):
+def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
+             correct_label, keep_prob, learning_rate):
     """
     Train neural network and print out the loss during training.
     :param sess: TF Session
@@ -164,6 +165,13 @@ def run():
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
 
+     # create the NN placeholders
+    learning_rate = tf.placeholder(tf.float32, name='learning_rate')
+    shape = (None,) + image_shape + (num_classes,)
+    correct_label = tf.placeholder(tf.float32, shape)
+    #keep_prob = tf.placeholder(tf.float32)
+
+
 
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
@@ -190,7 +198,8 @@ def run():
         save_model_path = './model/semantic_segmentation_model.ckpt'
 
         # TODO: Train NN using the train_nn function
-        train_nn(sess, epochs, batch_size, get_batches_fn, optimizer, cross_entropy_loss, keep_prob, learning_rate)
+        train_nn(sess, epochs, batch_size, get_batches_fn, optimizer, cross_entropy_loss, input_image,
+                 correct_label, keep_prob, learning_rate)
 
         # save the trained model
         saver.save(sess, save_model_path)
