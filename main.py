@@ -169,7 +169,7 @@ def run():
     learning_rate = tf.placeholder(tf.float32, name='learning_rate')
     shape = (None,) + image_shape + (num_classes,)
     correct_label = tf.placeholder(tf.float32, shape)
-    #keep_prob = tf.placeholder(tf.float32)
+    keep_prob = 1.0
 
 
 
