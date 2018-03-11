@@ -126,8 +126,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 tests.test_optimize(optimize)
 
 
-def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
-             correct_label, keep_prob, learning_rate):
+def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, keep_prob, learning_rate):
     """
     Train neural network and print out the loss during training.
     :param sess: TF Session
@@ -145,12 +144,11 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     for epoch in range(epochs):
         batch_num = 0
         for images, labels in get_batches_fn(batch_size):
-            # _, loss = sess.run([train_op, cross_entropy_loss],
-            #                    feed_dict={input_image: images, correct_label: labels, keep_prob: keep_prob, learning_rate:learning_rate})
-            # batch += 1
-            # print('Epoch {:>2}, step: {}, loss: {}  '.format(epoch + 1, batch_num, loss))
-            print(images.shape)
-            print(labels.shape)
+            _, loss = sess.run([train_op, cross_entropy_loss],
+                               feed_dict={input_image: images, correct_label: labels, keep_prob: keep_prob, learning_rate:learning_rate})
+            batch_num += 1
+            print('Epoch {:>2}, step: {}, loss: {}  '.format(epoch + 1, batch_num, loss))
+
 
 
 tests.test_train_nn(train_nn)
@@ -192,8 +190,7 @@ def run():
         save_model_path = './model/semantic_segmentation_model.ckpt'
 
         # TODO: Train NN using the train_nn function
-        train_nn(sess, epochs, batch_size, get_batches_fn, optimizer, cross_entropy_loss, input_image,
-                 correct_label, keep_prob, learning_rate)
+        train_nn(sess, epochs, batch_size, get_batches_fn, optimizer, cross_entropy_loss, keep_prob, learning_rate)
 
         # save the trained model
         saver.save(sess, save_model_path)
