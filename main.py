@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import os.path
 import tensorflow as tf
 import helper
@@ -76,7 +78,7 @@ def layers(
         padding='same',
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
-        name='1x1_conv_1'
+        name='1x1_conv_1',
         )
 
     # upsampling
@@ -89,7 +91,7 @@ def layers(
         padding='same',
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
-        name='deconv_1'
+        name='deconv_1',
         )
 
     # 1x1 convolution of vgg_layer4_out
@@ -101,7 +103,7 @@ def layers(
         padding='same',
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
-        name='1x1_conv_2'
+        name='1x1_conv_2',
         )
 
     # skip connection
@@ -118,7 +120,7 @@ def layers(
         padding='same',
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
-        name='deconv_2'
+        name='deconv_2',
         )
 
     # 1x1 convolution of vgg_layer3_out
@@ -130,7 +132,7 @@ def layers(
         padding='same',
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
-        name='1x1_conv_3'
+        name='1x1_conv_3',
         )
 
     # skip connection
@@ -147,7 +149,7 @@ def layers(
         padding='same',
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
-        name='deconv_3'
+        name='deconv_3',
         )
 
     return x
@@ -322,3 +324,5 @@ def run():
 
 if __name__ == '__main__':
     run()
+
+			
