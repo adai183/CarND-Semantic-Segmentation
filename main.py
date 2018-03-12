@@ -170,6 +170,7 @@ def run():
     learning_rate = tf.placeholder(tf.float32, name='learning_rate')
     shape = (None,) + image_shape + (num_classes,)
     correct_label = tf.placeholder(tf.float32, shape)
+    input_image = tf.placeholder(tf.float32, image_shape)
 
 
 
@@ -191,7 +192,7 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
-        input_image, keep_prob, vgg_layer3, vgg_layer4, vgg_layer7 = load_vgg(sess, vgg_path)
+        vgg_layer1, keep_prob, vgg_layer3, vgg_layer4, vgg_layer7 = load_vgg(sess, vgg_path)
         nn_last_layer = layers(vgg_layer3, vgg_layer4, vgg_layer7, num_classes)
         logits, optimizer, cross_entropy_loss = optimize(nn_last_layer, correct_label, learning_rate, num_classes)
 
