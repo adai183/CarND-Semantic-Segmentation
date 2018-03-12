@@ -133,7 +133,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         batch_num = 0
         for images, labels in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
-                               feed_dict={input_image: images, correct_label: labels, keep_prob: 1.0, learning_rate:0.00025})
+                               feed_dict={input_image: images, correct_label: labels, keep_prob: 0.5, learning_rate:0.0009})
             batch_num += 1
             print('Epoch {:>2}, step: {}, loss: {}  '.format(epoch + 1, batch_num, loss))
 
@@ -194,7 +194,6 @@ def run():
 
 
         # TODO: Save inference data using helper.save_inference_samples
-        #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
 
